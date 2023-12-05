@@ -1,5 +1,4 @@
 import { Button, Text, View } from "react-native";
-
 import { useState } from "react";
 
 function getElementAtRandomIndex(array) {
@@ -12,79 +11,97 @@ const OPTIONS = ["Rock", "Paper", "Scissors"];
 export default function App() {
   const [playerChoice, setPlayerChoice] = useState(null);
   const [computerChoice, setComputerChoice] = useState(null);
-  const [winner, setWinner] = useState(null);
+  const [score, setScore] = useState([0, 0]); // [playerScore, computerScore]
+  const [game, setGame] = useState(null);
 
   const makeMoves = (choice) => {
-    setComputerChoice(getElementAtRandomIndex(OPTIONS));
+    const computerMove = getElementAtRandomIndex(OPTIONS);
+    setComputerChoice(computerMove);
     setPlayerChoice(choice);
+    declareWinner(choice, computerMove);
   };
 
-  /*
-  Rock crushes scissors.
-  Scissors cut paper.
-  Paper covers rock.
-*/
-
   const declareWinner = (player1, player2) => {
+    let res = "";
+    let [playerScore, computerScore] = score;
+
     if (player1 === player2) {
-      return "Game is a tie!!";
+      res = "Game is a tie!!";
+    } else if (
+      (player1 === "Rock" && player2 === "Scissors") ||
+      (player1 === "Paper" && player2 === "Rock") ||
+      (player1 === "Scissors" && player2 === "Paper")
+    ) {
+      playerScore++;
+      res = `You won with ${player1}!!`;
+    } else {
+      computerScore++;
+      res = `Computer won with ${player2} :(`;
     }
-
-    if (player1 === "Rock" && player2 === "Scissors") {
-      return "You won with rock!!";
-    }
-    if (player1 === "Rock" && player2 === "Paper") {
-      return "Computer won with paper :(";
-    }
-
-    if (player1 === "Paper" && player2 === "Rock") {
-      return "You won with paper!!";
-    }
-    if (player1 === "Paper" && player2 === "Scissors") {
-      return "Computer won with scissors :(";
-    }
-
-    if (player1 === "Scissors" && player2 === "Paper") {
-      return "You won with scissors!!";
-    }
-    if (player1 === "Scissors" && player2 === "Rock") {
-      return "Computer won with rock :(";
-    }
+    setScore([playerScore, computerScore]);
+    setGame(res);
   };
 
   return (
     <>
-      <View style={{ height: "100%", marginTop: 300 }}>
-        <View>
-          {playerChoice == null ? (
-            <View>
-              <Text style={{ fontSize: 24, color: "red", textAlign: "center" }}>
-                Rock / Paper / Scissors
-              </Text>
-              <Button title="Rock" onPress={() => makeMoves("Rock")} />
-              <Button title="Paper" onPress={() => makeMoves("Paper")} />
-              <Button title="Scissors" onPress={() => makeMoves("Scissors")} />
-            </View>
-          ) : (
-            <View>
-              <Text
-                style={{ fontSize: 20, color: "green", textAlign: "center" }}
-              >
-                You picked {playerChoice}.
-              </Text>
-              <Text
-                style={{ fontSize: 20, color: "green", textAlign: "center" }}
-              >
-                Computer picked {computerChoice}.
-              </Text>
+      <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+        <Text
+          style={{
+            fontSize: 24,
+            color: "blue",
+            textAlign: "center",
+            marginBottom: 20,
+          }}
+        >
+          Rock / Paper / Scissors
+        </Text>
+        <Text
+          style={{
+            fontSize: 18,
+            color: "black",
+            textAlign: "center",
+            marginBottom: 10,
+          }}
+        >
+          Score: {score[0]} : {score[1]}
+        </Text>
 
-              <Text style={{ fontSize: 20, color: "red", textAlign: "center" }}>
-                {declareWinner(playerChoice, computerChoice)}
-              </Text>
-              <Button title="Reset" onPress={() => setPlayerChoice(null)} />
-            </View>
-          )}
-        </View>
+        {playerChoice == null ? (
+          <>
+            <Button
+              title="Rock"
+              onPress={() => makeMoves("Rock")}
+              color="skyblue"
+            />
+            <Button
+              title="Paper"
+              onPress={() => makeMoves("Paper")}
+              color="pink"
+            />
+            <Button
+              title="Scissors"
+              onPress={() => makeMoves("Scissors")}
+              color="lightgreen"
+            />
+          </>
+        ) : (
+          <>
+            <Text style={{ fontSize: 20, color: "green", textAlign: "center" }}>
+              You picked {playerChoice}.
+            </Text>
+            <Text style={{ fontSize: 20, color: "green", textAlign: "center" }}>
+              Computer picked {computerChoice}.
+            </Text>
+            <Text style={{ fontSize: 20, color: "red", textAlign: "center" }}>
+              {game}
+            </Text>
+            <Button
+              title="Reset"
+              onPress={() => setPlayerChoice(null)}
+              color="orange"
+            />
+          </>
+        )}
       </View>
     </>
   );
